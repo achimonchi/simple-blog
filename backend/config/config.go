@@ -1,7 +1,12 @@
 package config
 
 type Config struct {
-	Database ConfigDB
+	Database *ConfigDB
+	App      *ConfigApp
+}
+
+type ConfigApp struct {
+	Port string
 }
 
 type ConfigDB struct {

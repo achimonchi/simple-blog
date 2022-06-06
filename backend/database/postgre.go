@@ -11,7 +11,7 @@ import (
 
 func GetConnection(conf *config.ConfigDB) *sql.DB {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s", conf.Host, conf.Port, conf.User, conf.Pass, conf.SSLMode)
-	fmt.Println(dsn)
+
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		panic(err)

@@ -6,22 +6,40 @@ import (
 	"simple-blog/config"
 	"simple-blog/constants"
 	"simple-blog/database"
+	"simple-blog/server"
+	"simple-blog/server/controller"
+	"simple-blog/server/repository"
+	"simple-blog/server/service"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
 	fmt.Println("Server running ...")
 	conf := initConfig()
 
-	db := database.GetConnection(&conf.Database)
+	db := database.GetConnection(conf.Database)
 	if db != nil {
 		fmt.Println("db connected")
 	}
+
+	userRepo := repository.NewUserRepo(db)
+	userService := service.NewUserService(userRepo)
+	userController := controller.NewUserController(userService)
+
+	controller := controller.NewController(userController)
+
+	router := httprouter.New()
+	route := server.NewRoute(conf.App, router, controller)
+
+	route.StartServer()
 }
 
 func initConfig() *config.Config {
 	var config config.Config
-	config.Database = *initDB()
+	config.Database = initDB()
+	config.App = initApp()
 	return &config
 }
 
@@ -51,4 +69,12 @@ func initDB() *config.ConfigDB {
 	}
 
 	return &dbConfig
+}
+
+func initApp() *config.ConfigApp {
+	port := os.Getenv(constants.APP_PORT)
+
+	return &config.ConfigApp{
+		Port: port,
+	}
 }
